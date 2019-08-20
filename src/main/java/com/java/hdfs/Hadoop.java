@@ -57,10 +57,10 @@ public class Hadoop {
 			 **************************************************/
 			
 			if(fileCopy(fileName)) { // hadoop 저장소에 복사
-				try {
+				try { // mapReduser 에서 책임 전가 받은 예외처리
 					 if(mapReduser()) { // Map reduce 정제
 						 status = 2;
-						 try {
+						 try { // resultData 에서 책임 전가 받은 예외처리
 							 String getdata = resultData();
 							 resultMap.put("result", getdata);
 						 } catch (IOException e) {
@@ -69,9 +69,21 @@ public class Hadoop {
 							 System.out.println("파일 읽기 오류");
 						 }
 					 }
+				} catch (ClassNotFoundException e) {
+					 e.printStackTrace();
+					 status = 1;
+					 System.out.println("맵 리듀스 오류 = 클래스 없다");
+				} catch (IOException e) {
+					 e.printStackTrace();
+					 status = 1;
+					 System.out.println("맵 리듀스 오류 = 입출력");
+				} catch (InterruptedException e) {
+					 e.printStackTrace();
+					 status = 1;
+					 System.out.println("맵 리듀스 오류 = 중간에 중지됨");
 				} catch (Exception e) {
 					e.printStackTrace();
-					System.out.println("정제 오류");
+					System.out.println("알수없는 오류");
 					status = 1;
 				}
 			}
