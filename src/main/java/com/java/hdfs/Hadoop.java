@@ -69,7 +69,7 @@ public class Hadoop {
 							 System.out.println("파일 읽기 오류");
 						 }
 					 }
-				} catch (ClassNotFoundException | IOException | InterruptedException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					System.out.println("정제 오류");
 					status = 1;
