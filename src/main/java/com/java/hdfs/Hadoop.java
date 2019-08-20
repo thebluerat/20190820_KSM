@@ -24,6 +24,7 @@ public class Hadoop {
 	// hadoop 접속 주소 (hadoop server ip 수정 할것) <<<<<<<<<<<<<<<<<<
 	protected final String URL = "hdfs://192.168.3.69:9000";
 	protected final String LOCAL = "/root/data/";
+//	protected final String LOCAL = "D:\\eclipse-workspace\\20190820_KSM\\data/";
 	// hadoop 정제 대상 경로 / 처리 결과 저장 경로 및 파일
 	protected final String INPUT = "/input/";
 	protected final String OUTPUT = "/output";
@@ -55,7 +56,25 @@ public class Hadoop {
 			 * 3) 성공 시 결과 받기 : resultData()
 			 **************************************************/
 			
-			
+			if(fileCopy(fileName)) { // hadoop 저장소에 복사
+				try {
+					 if(mapReduser()) { // Map reduce 정제
+						 status = 2;
+						 try {
+							 String getdata = resultData();
+							 resultMap.put("result", getdata);
+						 } catch (IOException e) {
+							 e.printStackTrace();
+							 status = 1;
+							 System.out.println("파일 읽기 오류");
+						 }
+					 }
+				} catch (ClassNotFoundException | IOException | InterruptedException e) {
+					e.printStackTrace();
+					System.out.println("정제 오류");
+					status = 1;
+				}
+			}
 		}
 		resultMap.put("status", status);
 		System.out.println("Hadoop.run() >> End");
@@ -68,7 +87,7 @@ public class Hadoop {
 		boolean status = true;
 		try {
 			// 접속 설정 객체 변수
-			localConf = new Configuration();
+			localConf = new Configuration(); // 설정 파일
 			hadoopConf = new Configuration();
 			hadoopConf.set("fs.defaultFS", URL);
 			
@@ -155,7 +174,7 @@ public class Hadoop {
 			int byteRead = 0;
 			while((byteRead = fsis.read()) > 0) { 
 				// 정제 결과를 문자열 변수에 담기
-				sb.append(byteRead);
+				sb.append((char)byteRead);
 			}
 			fsis.close();
 		}

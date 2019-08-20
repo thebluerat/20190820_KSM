@@ -1,6 +1,7 @@
 package com.java;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -29,13 +30,27 @@ public class Home extends HttpServlet {
 		String file_name = req.getParameter("file_name");		
 		if(file_name == null || ("").equals(file_name)) {
 			// 정제 요청 대상 파일명 값이 없으면 Home 화면 요청
-			res.sendRedirect("/Home");
+			res.sendRedirect("/20190820_KSM/Home");
 		} else {
 			// 정제 요청 대상 파일명 값이 있으면 HDFS 실행 요청 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			Hadoop hadoop = new Hadoop();
-			hadoop.run(file_name);
+			HashMap<String, Object> resultMap = hadoop.run(file_name);
 			
-			req.setAttribute("1987.csv", file_name);
+			
+			int status = Integer.parseInt(resultMap.get("status").toString());
+			String result = "";
+			if(status == 0) {
+				result = "접속 오류";
+			} else if(status == 1) {
+				result = "정제 오류";
+			} else if(status == 2) {
+				result = resultMap.get("result").toString();
+			} else {
+				result = "예상치 못한 오류";
+			}
+			
+			req.setAttribute("file_name", file_name);
+			req.setAttribute("result", result);
 			RequestDispatcher rd = req.getRequestDispatcher(viewPath("result"));
 			rd.forward(req, res);
 		}
